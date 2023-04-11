@@ -1,0 +1,10 @@
+Model Technology ModelSim SE-64 vlog 10.4 Compiler 2014.12 Dec  3 2014
+Start time: 11:23:06 on Apr 11,2023
+vlog -work work -lint -f modelsim.args 
+** Error: (vlog-7) Failed to open ini file "modelsim.ini" in read mode.
+No such file or directory. (errno = ENOENT)
+** Error: (vlog-7) Failed to open ini file "modelsim.ini" in read mode.
+No such file or directory. (errno = ENOENT)
+** Error: Verilog Compiler exiting
+End time: 11:23:06 on Apr 11,2023, Elapsed time: 0:00:00
+Errors: 3, Warnings: 0
