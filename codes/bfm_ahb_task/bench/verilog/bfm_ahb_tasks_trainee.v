@@ -16,7 +16,30 @@ input  [31:0] address;
 input  [ 2:0] size;
 output [31:0] data;
 begin
-    ... fill
+    @ (posedge HCLK);
+    HBUSREQ <= #1 1'b1;
+    @ (posedge HCLK);
+    while ((HGRANT!==1'b1)||(HREADY!==1'b1)) @ (posedge HCLK);
+    HBUSREQ <= #1 1'b0;
+    HADDR   <= #1 address;
+    HPROT   <= #1 4'b0001; //`HPROT_DATA
+    HTRANS  <= #1 2'b10;  //`HTRANS_NONSEQ;
+    HBURST  <= #1 3'b000; //`HBURST_SINGLE;
+    HWRITE  <= #1 1'b0;   //`HWRITE_READ;
+    case (size)
+    1:  HSIZE <= #1 3'b000; //`HSIZE_BYTE;
+    2:  HSIZE <= #1 3'b001; //`HSIZE_HWORD;
+    4:  HSIZE <= #1 3'b010; //`HSIZE_WORD;
+    default: $display($time,, "ERROR: unsupported transfer size: %d-byte", size);
+    endcase
+    @ (posedge HCLK);
+    while (HREADY!==1'b1) @ (posedge HCLK);
+    HTRANS <= #1 2'b0;
+    @ (posedge HCLK);
+    while (HREADY===0) @ (posedge HCLK);
+    data = HRDATA; // must be blocking
+    if (HRESP!=2'b00)   $display($time,, "ERROR: non OK response for read");
+    @ (posedge HCLK);
 end
 endtask
 
@@ -26,7 +49,30 @@ input  [31:0] address;
 input  [ 2:0] size;
 input  [31:0] data;
 begin
-    ... fill
+        @ (posedge HCLK);
+    HBUSREQ <= #1 1;
+    @ (posedge HCLK);
+    while ((HGRANT!==1'b1)||(HREADY!==1'b1)) @ (posedge HCLK);
+    HBUSREQ <= #1 1'b0;
+    HADDR   <= #1 address;
+    HPROT   <= #1 4'b0001; //`HPROT_DATA
+    HTRANS  <= #1 2'b10;  //`HTRANS_NONSEQ;
+    HBURST  <= #1 3'b000; //`HBURST_SINGLE;
+    HWRITE  <= #1 1'b1;   //`HWRITE_WRITE;
+    case (size)
+    1:  HSIZE <= #1 3'b000; //`HSIZE_BYTE;
+    2:  HSIZE <= #1 3'b001; //`HSIZE_HWORD;
+    4:  HSIZE <= #1 3'b010; //`HSIZE_WORD;
+    default: $display($time,, "ERROR: unsupported transfer size: %d-byte", size);
+    endcase
+    @ (posedge HCLK);
+    while (HREADY!==1) @ (posedge HCLK);
+    HWDATA <= #1 data;
+    HTRANS <= #1 2'b0;
+    @ (posedge HCLK);
+    while (HREADY===0) @ (posedge HCLK);
+    if (HRESP!=2'b00)  $display($time,, "ERROR: non OK response write");
+    @ (posedge HCLK);
 end
 endtask
 //-------------------------------------------------------------
