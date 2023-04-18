@@ -12,10 +12,10 @@
 // VERSION = 2013.01.31.
 //--------------------------------------------------------
 task ahb_read;
-input  [31:0] address;
-input  [ 2:0] size;
-output [31:0] data;
-begin
+    input  [31:0] address;
+    input  [ 2:0] size;
+    output [31:0] data;
+    begin
     @ (posedge HCLK);
     HBUSREQ <= #1 1'b1;
     @ (posedge HCLK);
@@ -40,7 +40,7 @@ begin
     data = HRDATA; // must be blocking
     if (HRESP!=2'b00)   $display($time,, "ERROR: non OK response for read");
     @ (posedge HCLK);
-end
+    end
 endtask
 
 //-----------------------------------------------------
